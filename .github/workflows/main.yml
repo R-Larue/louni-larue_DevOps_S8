@@ -24,4 +24,4 @@ jobs:
 
      #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn build test
+        run: mvn clean verify
