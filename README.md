@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # DevOps Larue-Louni S8
 
 ## Docker TP
@@ -158,7 +157,3 @@ docker run --name simpleappwbdd --net=app-network -p 8080:8080 -d simpleapiwbdd
 ```
 
 ### HTTP server
-=======
-# simple-api-devops
-
->>>>>>> Init Java App
