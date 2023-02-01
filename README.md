@@ -156,3 +156,165 @@ docker build -t simpleapiwbdd .
 docker run --name simpleappwbdd --net=app-network -p 8080:8080 -d simpleapiwbdd
 ```
 
+### HTTP server
+
+```
+<VirtualHost *:80>
+    ProxyPreserveHost On
+    ProxyPass / http://simpleappwbdd:8080/
+    ProxyPassReverse / http://simpleappwbdd:8080/
+</VirtualHost>
+```
+
+### Docker-Compose
+
+```
+docker exec -it 687e95097992 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
+```
+
+```
+version: '3.7'
+
+services:
+    backend:
+        container_name: simpleappwbdd
+        build: ../JavaBDD/simple-api-student-main/simple-api-student-main/.
+        networks:
+         - my-network
+        depends_on:
+         - database
+
+    database:
+        container_name: postgres
+        build: ../.
+        volumes:
+         - ../data:/var/lib/postgresql/data
+        networks:
+         - my-network
+
+    httpd:
+        build: ../HTTPServer/.
+        ports:
+         - 80:80
+        networks:
+         - my-network
+        depends_on:
+         - backend
+         - database
+
+networks:
+    my-network:
+     external:
+      name: app-network
+
+```
+
+## Github-CI
+
+### Setup GitHub Actions
+```
+name: CI devops 2023
+on:
+  #to begin you want to launch this job in main and develop
+  push:
+    branches:
+     - main
+     - develop 
+  pull_request:
+```
+
+#### Build and test your Application
+```
+
+```
+#### First steps into the CD World
+```
+
+```
+
+## Setup Quality Gate
+
+### Register to SonarCloud
+```
+ - name: Login to DockerHub
+   run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+ - name: Build and test with Maven
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./pom.xml
+```
+
+#### Fichier main.yml Version Final
+
+```
+name: CI devops 2023
+on:
+  #to begin you want to launch this job in main and develop
+  push:
+    branches:
+     - main
+     - develop 
+  pull_request:
+
+jobs:
+  test-backend: 
+    runs-on: ubuntu-22.04
+    steps:
+     #checkout your github code using actions/checkout@v2.5.0
+      - uses: actions/checkout@v2.5.0
+
+     #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+     #finally build your app with the latest command
+      - name: Build and test with Maven
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./pom.xml
+
+#define job to build and publish docker image
+  build-and-push-docker-image:
+     needs: test-backend
+     # run only when code is compiling and tests are passing
+     runs-on: ubuntu-22.04
+
+     # steps to perform in job
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v2.5.0
+         
+         
+       - name: Login to DockerHub
+         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+
+
+       - name: Build image and push backend
+         uses: docker/build-push-action@v3
+         with:
+           # relative path to the place where source code with Dockerfile is located
+           context: .
+           # Note: tags has to be all lower-case
+           tags:  ${{secrets.DOCKER_USERNAME}}/simple-api
+           push: ${{ github.ref == 'refs/heads/main' }}
+
+       - name: Build image and push database
+         uses: docker/build-push-action@v3
+         with:
+           # relative path to the place where source code with Dockerfile is located
+           context: ./DB
+           # Note: tags has to be all lower-case
+           tags:  ${{secrets.DOCKER_USERNAME}}/db
+           push: ${{ github.ref == 'refs/heads/main' }}
+
+       - name: Build image and push httpd
+         uses: docker/build-push-action@v3
+         with:
+           # relative path to the place where source code with Dockerfile is located
+           context: ./HTTP
+           # Note: tags has to be all lower-case
+           tags:  ${{secrets.DOCKER_USERNAME}}/http
+           push: ${{ github.ref == 'refs/heads/main' }}
+```
