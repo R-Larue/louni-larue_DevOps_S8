@@ -24,7 +24,7 @@ jobs:
 
      #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./pom.xml
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./Backend_1/pom.xml ./Backend_2/pom.xml
 
 # define job to build and publish docker image
   build-and-push-docker-image:
@@ -43,13 +43,22 @@ jobs:
 
 
 
-       - name: Build image and push backend
+       - name: Build image and push backend1
          uses: docker/build-push-action@v3
          with:
            # relative path to the place where source code with Dockerfile is located
-           context: .
+           context: ./Backend_1
            # Note: tags has to be all lower-case
-           tags:  ${{secrets.DOCKER_USERNAME}}/simple-api
+           tags:  ${{secrets.DOCKER_USERNAME}}/simple-api1
+           push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push backend2
+         uses: docker/build-push-action@v3
+         with:
+           # relative path to the place where source code with Dockerfile is located
+           context: ./Backend_2
+           # Note: tags has to be all lower-case
+           tags:  ${{secrets.DOCKER_USERNAME}}/simple-api2
            push: ${{ github.ref == 'refs/heads/main' }}
 
        - name: Build image and push database
