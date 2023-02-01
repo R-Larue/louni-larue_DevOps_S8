@@ -156,4 +156,3 @@ docker build -t simpleapiwbdd .
 docker run --name simpleappwbdd --net=app-network -p 8080:8080 -d simpleapiwbdd
 ```
 
-### HTTP server
