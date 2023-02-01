@@ -34,12 +34,14 @@ jobs:
 
      # steps to perform in job
      steps:
-     
+       - name: Checkout code
+         uses: actions/checkout@v2.5.0
+         
+         
        - name: Login to DockerHub
          run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-       - name: Checkout code
-         uses: actions/checkout@v2.5.0
+
 
        - name: Build image and push backend
          uses: docker/build-push-action@v3
