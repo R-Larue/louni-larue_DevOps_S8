@@ -25,24 +25,6 @@ jobs:
      #finally build your app with the latest command
       - name: Build and test with Maven
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./Backend_1/pom.xml
-    
-  test-backend-2: 
-    runs-on: ubuntu-22.04
-    steps:
-     #checkout your github code using actions/checkout@v2.5.0
-      - uses: actions/checkout@v2.5.0
-
-     #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-
-     #finally build your app with the latest command
-      - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./Backend_2/pom.xml
 
 # define job to build and publish docker image
   build-and-push-docker-image:
