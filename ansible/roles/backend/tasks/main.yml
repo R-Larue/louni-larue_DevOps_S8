@@ -3,6 +3,7 @@
   - name: Run Backend
     community.docker.docker_container:
       name: simpleappwbdd
+      state: started
       image: schtoukai/simple-api
       networks:
         - name: app-network

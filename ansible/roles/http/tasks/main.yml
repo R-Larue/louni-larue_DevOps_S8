@@ -4,6 +4,7 @@
   community.docker.docker_container:
     name: httpd
     image: schtoukai/http
+    state: started
     pull: true
     ports:
       - "80:80"
