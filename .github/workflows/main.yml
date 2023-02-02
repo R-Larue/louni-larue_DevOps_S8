@@ -30,17 +30,11 @@ jobs:
       - name: Login to DockerHub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{
           secrets.DOCKER_ACCESS_TOKEN }}
-      - name: Build image and push backend1
+      - name: Build image and push backend
         uses: docker/build-push-action@v3
         with:
-          context: ./Backend_1
-          tags: ${{secrets.DOCKER_USERNAME}}/simple-api1
-          push: ${{ github.ref == 'refs/heads/main' }}
-      - name: Build image and push backend2
-        uses: docker/build-push-action@v3
-        with:
-          context: ./Backend_2
-          tags: ${{secrets.DOCKER_USERNAME}}/simple-api2
+          context: ./Backend1
+          tags: ${{secrets.DOCKER_USERNAME}}/simple-api
           push: ${{ github.ref == 'refs/heads/main' }}
       - name: Build image and push database
         uses: docker/build-push-action@v3
