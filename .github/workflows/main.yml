@@ -7,7 +7,7 @@ on:
       - develop
   pull_request: null
 jobs:
-  test-backend-1:
+  test-backend:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2.5.0
