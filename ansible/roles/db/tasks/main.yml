@@ -1,0 +1,11 @@
+---
+# tasks file for roles/db
+  - name: Run DB
+    community.docker.docker_container:
+      name: db
+      image: schtoukai/db
+      volumes:
+        - ../data:/var/lib/postgresql/data
+      networks:
+        - name: app-network
+

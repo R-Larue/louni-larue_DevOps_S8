@@ -1,0 +1,9 @@
+---
+# tasks file for roles/backend
+  - name: Run Backend
+    community.docker.docker_container:
+      name: simpleappwbdd
+      image: schtoukai/simple-api
+      networks:
+        - name: app-network
+

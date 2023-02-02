@@ -1,0 +1,10 @@
+---
+# tasks file for roles/http
+- name: Run HTTPD
+  community.docker.docker_container:
+    name: httpd
+    image: schtoukai/http
+    ports:
+      - "80:80"
+    networks:
+      - name: app-network

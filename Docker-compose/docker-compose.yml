@@ -3,7 +3,7 @@ version: '3.7'
 services:
     backend:
         container_name: simpleappwbdd
-        build: ../JavaBDD/simple-api-student-main/simple-api-student-main/.
+        build: ../Backend1/.
         networks:
          - my-network
         depends_on:
@@ -11,14 +11,15 @@ services:
 
     database:
         container_name: postgres
-        build: ../.
+        build: ../DB/.
         volumes:
          - ../data:/var/lib/postgresql/data
         networks:
          - my-network
 
     httpd:
-        build: ../HTTPServer/.
+        build: ../HTTP/.
+        container_name: httpd
         ports:
          - 80:80
         networks:
