@@ -188,6 +188,16 @@ docker run --name simpleappwbdd --net=app-network -p 8080:8080 -d simpleapiwbdd
 
 ## HTTP server
 
+Cette partie consiste en la mise en place d'un reverse proxy, permettant d'avoir une application front-end.
+
+Afin de récupérer la configuration de base, on utilise la commande :
+
+```
+docker exec -it 687e95097992 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
+```
+
+On modifie la configuration en ajoutant un virtualhost:
+
 ```
 <VirtualHost *:80>
     ProxyPreserveHost On
@@ -198,9 +208,11 @@ docker run --name simpleappwbdd --net=app-network -p 8080:8080 -d simpleapiwbdd
 
 ## Docker-Compose
 
-```
-docker exec -it 687e95097992 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
-```
+Afin de ne pas avoir à lancer, arrêter et build les containers manuellement, on peut utiliser docker-compose.
+C'est un outil qui permet d'orchestrer plusieurs containers en même temps par l'execution d'une seule commande.
+
+Le docker-compose.yml est trouvable ci-dessous.
+Il est composé de 3 services, où on configure à chaque fois le nom, le path à build, les networks et les dépendances.
 
 ```
 version: '3.7'
@@ -239,33 +251,19 @@ networks:
 
 ```
 
-## Github-CI
+## Github Actions, Github CI
 
 ### Setup GitHub Actions
-```
-name: CI devops 2023
-on:
-  #to begin you want to launch this job in main and develop
-  push:
-    branches:
-     - main
-     - develop 
-  pull_request:
-```
 
-### Setup Quality Gate
+Github action est un service github permettant de construire des pipelines, c'est à dire des tests qui se lancent automatiquement à chaque nouveau push de l'application, par exemple.
 
-### Register to SonarCloud
-```
- - name: Login to DockerHub
-   run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+Les tests sont lancés grace aux TestContainers, trouvables dans le pom.
 
- - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./pom.xml
-```
 
 ### Fichier main.yml Version Finale
 
+Première partie qui correspond à "quand l'action est-elle lancée".
+
 ```
 name: CI devops 2023
 on:
@@ -275,7 +273,13 @@ on:
      - main
      - develop 
   pull_request:
+```
 
+Ensuite, on décrit chacun des jobs, c'est à dire les actions qui seront effectuées.
+Déjà, on lance un test du backend, puis on publie l'image sur dockerhub.
+On y trouve aussi la connexion au sonar, expliqué dans la partie suivante.
+
+```
 jobs:
   test-backend: 
     runs-on: ubuntu-22.04
@@ -338,4 +342,18 @@ jobs:
            # Note: tags has to be all lower-case
            tags:  ${{secrets.DOCKER_USERNAME}}/http
            push: ${{ github.ref == 'refs/heads/main' }}
+```
+### Setup Quality Gate
+
+Une quality gate permet de définir des critères de qualité nécessaires pour répondre à certains impératifs comme par exemple des points de tensions nécessaires à passer pour déployer l'application.
+
+Ici, on va utiliser SonarCloud.
+
+### Register to SonarCloud
+```
+ - name: Login to DockerHub
+   run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+ - name: Build and test with Maven
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=R-Larue_louni-larue_DevOps_S8 -Dsonar.organization=r-larue -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./pom.xml
 ```
